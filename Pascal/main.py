@@ -9,9 +9,11 @@
 @Desc    :   None
 '''
 
+import os
 import requests
-import re
+import urllib.request as urlrequest
 from bs4 import BeautifulSoup as bsoup
+from tqdm import tqdm
 
 
 def request_pascal(url):
@@ -41,17 +43,33 @@ def parser_page(page):
 if __name__=='__main__':
 
     url = 'https://vision.cs.uiuc.edu/pascal-sentences/'
-    data_path = './data/'
+    os_path = os.path.abspath(os.getcwd())
+    data_path = os_path+'/Pascal/data/'
 
     page = request_pascal(url)
     
     data_class, img_name, txt_table = parser_page(page)
-    print(data_class[1])
-    img_url = [url+'/'+data_class[index]+'/'+img_name[index] for index in range(len(img_name))]
-    if len(img_url)!=len(txt_table):
+    # img_url = [url+'/'+data_class[index]+'/'+img_name[index] for index in range(len(img_name))]
+    if len(img_name)!=len(txt_table):
         print("Data Error, over!")
         exit
 
-    print(len(txt_table))
-    a = txt_table[2].find_all('td')
-    print(a)
+    label_text = data_path+"label.txt"
+    lab_f = open(label_text, 'w')
+    for index in tqdm(range(len(img_name)), ncols=80):
+
+        text_name = data_path+'text/'+img_name[index][:-4]+'.txt'
+        local_img = data_path+'images/'+img_name[index]
+        img_url = url+data_class[index]+'/'+img_name[index]
+        urlrequest.urlretrieve(img_url,filename=local_img)
+        text_str = ""
+        for txt in txt_table[index].find_all('td'):
+            tstr = txt.get_text()
+            text_str = text_str+"\t"+tstr
+        with open(text_name,'w') as fp:
+            fp.write(text_str)
+        
+        lab_f.write(data_class[index])
+        lab_f.write('\n')
+
+    lab_f.close()
