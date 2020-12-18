@@ -10,7 +10,6 @@
 '''
 
 import requests
-import lxml
 import re
 from bs4 import BeautifulSoup as bsoup
 
@@ -25,21 +24,34 @@ def request_pascal(url):
         return None
 
 def parser_page(page):
-    imgurl_list = []
+    img_name = []
+    txt_table = []
+    data_class = []
     soup = bsoup(page, features='lxml')
     img_list = soup.find_all('img')
     for img in img_list:
-        imgurl_list.append(img.get('src'))
-    
-    return imgurl_list
+        url_str = img.get('src').split('/')
+        data_class.append(url_str[0])
+        img_name.append(url_str[1])
+
+    for txt in soup.find_all('table'):
+        txt_table.append(txt)
+    return data_class, img_name, txt_table[1:]
 
 if __name__=='__main__':
 
     url = 'https://vision.cs.uiuc.edu/pascal-sentences/'
+    data_path = './data/'
+
     page = request_pascal(url)
-    if page is None:
+    
+    data_class, img_name, txt_table = parser_page(page)
+    print(data_class[1])
+    img_url = [url+'/'+data_class[index]+'/'+img_name[index] for index in range(len(img_name))]
+    if len(img_url)!=len(txt_table):
+        print("Data Error, over!")
         exit
-    add_prestr = lambda b:url+b
-    soup = parser_page(page)
-    soup = map(add_prestr,soup)
-    print(soup[0])
+
+    print(len(txt_table))
+    a = txt_table[2].find_all('td')
+    print(a)
