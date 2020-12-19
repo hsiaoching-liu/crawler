@@ -6,7 +6,7 @@
 @Version :   1.0
 @Contact :   itliuxiaoqing@163.com
 @License :   (C)Copyright 2020-, Liugroup-NLPR-CASIA
-@Desc    :   None
+@Desc    :   https://vision.cs.uiuc.edu/pascal-sentences/  crawler
 '''
 
 import os
