@@ -56,8 +56,9 @@ if __name__=='__main__':
 
     label_text = data_path+"label.txt"
     lab_f = open(label_text, 'w')
-    for index in tqdm(range(len(img_name)), ncols=80):
-
+    tqdm_range = tqdm(range(len(img_name)), ncols=80)
+    for index in tqdm_range:
+        tqdm_range.set_description(img_name[index])
         text_name = data_path+'text/'+img_name[index][:-4]+'.txt'
         local_img = data_path+'images/'+img_name[index]
         img_url = url+data_class[index]+'/'+img_name[index]
